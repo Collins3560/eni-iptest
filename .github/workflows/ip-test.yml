@@ -1,0 +1,19 @@
+name: free-tier-ip-test
+on:
+  workflow_dispatch:
+jobs:
+  probe:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - name: egress identity
+        run: curl -s https://www.cloudflare.com/cdn-cgi/trace | grep -E '^(ip|warp|colo)=' || true
+      - name: install opencode
+        run: npm install -g @opencode/cli
+      - name: version
+        run: opencode --version
+      - name: free model call
+        env:
+          OPENCODE_API_KEY: ${{ secrets.OPENCODE_KEY }}
+        run: |
+          opencode run -m opencode/deepseek-v4.1-flash-free "Reply with exactly: PONG" 2>&1 | tail -6
